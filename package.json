@@ -1,0 +1,45 @@
+{
+  "name": "step-by-step",
+  "version": "1.0.0",
+  "description": "A two-person intelligence game.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config build/webpack.prod.config.js",
+    "dev": "webpack-dev-server --open --mode development --config build/webpack.dev.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/travelclover/stepByStep.git"
+  },
+  "keywords": [
+    "game",
+    "stepByStep"
+  ],
+  "author": "travelclover",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/travelclover/stepByStep/issues"
+  },
+  "homepage": "https://github.com/travelclover/stepByStep#readme",
+  "devDependencies": {
+    "autoprefixer-loader": "^3.2.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-es2015": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^0.28.11",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
+    "less": "^3.0.4",
+    "less-loader": "^4.1.0",
+    "postcss-loader": "^2.1.5",
+    "style-loader": "^0.21.0",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.7.0",
+    "webpack-cli": "^2.1.3",
+    "webpack-dev-server": "^3.1.4"
+  }
+}
