@@ -61,32 +61,6 @@ module.exports = {
       template: './src/index.html',
       inject: true,
       // hash: true
-    }),
-    new CopyWebpackPlugin([
-      {
-        from: 'lib/jquery-1.10.1.min.js',
-        to: 'js/jquery-1.10.1.min.js'
-      },
-      {
-        from: 'lib/swiper-4.1.6.min.js',
-        to: 'js/swiper-4.1.6.min.js'
-      },
-      {
-        from: 'lib/swiper.animate1.0.3.min.js',
-        to: 'js/swiper.animate1.0.3.min.js'
-      },
-      {
-        from: 'lib/normalize.css',
-        to: 'css/normalize.css'
-      },
-      {
-        from: 'lib/swiper-4.1.6.min.css',
-        to: 'css/swiper-4.1.6.min.css'
-      },
-      {
-        from: 'lib/animate.min.css',
-        to: 'css/animate.min.css'
-      },
-    ])
+    })
   ],
 }
