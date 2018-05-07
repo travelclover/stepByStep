@@ -11,16 +11,17 @@ class Game {
   // 初始化
   init() {
     this.checkerboardWrap = document.getElementById('checkerboardWrap'); // 棋盘wrap
-    this.checkerboard = document.createElement('div');
+    this.SPACE_WIDTH = this.checkerboardWrap.clientHeight / 46; // 间隙宽度
+    this.SQUARE_WIDTH = 4 * this.SPACE_WIDTH; // 棋格宽度
     this.createCheckerboard(); // 生成棋盘
   }
   // 生成棋盘
   createCheckerboard() {
-    const row = 19;
-    const col = 19;
+    const ROW = 19;
+    const COL = 19;
     let blocks = [];
-    for (let i = 0; i < row; i++) {
-      for (let j = 0; j < col; j++) {
+    for (let i = 0; i < ROW; i++) {
+      for (let j = 0; j < COL; j++) {
         if (i % 2 == 0) { // 偶数行
           if (j % 2 == 0) { // 偶数列
             // 生成木板与木板之间的空隙块
@@ -41,9 +42,7 @@ class Game {
       }
     }
 
-    this.SPACE_WIDTH = this.checkerboardWrap.clientHeight / 46; // 间隙宽度
-    this.SQUARE_WIDTH = 4 * this.SPACE_WIDTH; // 棋格宽度
-
+    this.checkerboard = document.createElement('div');
     this.checkerboard.style.width = '100%';
     this.checkerboard.style.height = '100%';
     for (let i = 0; i < blocks.length; i++) {
