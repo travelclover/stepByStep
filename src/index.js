@@ -1,7 +1,7 @@
 import indexCSS from './style/index.less'; // 样式文件
 import Game from './Game.js';
 
-let game = new Game();
+let game = new Game('checkerboardWrap');
 game.begin();
 
 // 生成棋盘
