@@ -4,6 +4,8 @@ import HorizontalBlock from './HorizontalBlock.js';
 import VerticalBlock from './VerticalBlock.js';
 import SquareBlock from './SquareBlock.js';
 
+const plankOnclick = Symbol('plankOnclick'); // 木板点击函数的函数名，为了私有方法效果
+
 class Game {
   constructor(id) {
     this.init(id);
@@ -23,7 +25,6 @@ class Game {
       this.y = this.getY(event);
     })
     this.canvas.addEventListener("mousedown", (event) => {
-      let self = this;
       let x = this.getX(event);
       let y = this.getY(event);
       let block = this.blocks.find((block) => {
@@ -31,100 +32,9 @@ class Game {
           return true;
         }
       });
-      let prevBlock; // 前一个木板
-      let nextBlock; // 后一个木板
+
       if (block.width != block.height) { // 宽高不相等则是木板
-        // 如果木板状态不为1和2，则return
-        if (block.status != 1 && block.status != 2) {
-          return;
-        }
-        // 判断是横还是竖木板
-        if (block.x % 2 == 0) { // 竖
-          prevBlock = block.y === 1 ? null : this.getBlockByPoint(block.x, block.y - 2);
-          nextBlock = block.y === 17 ? null : this.getBlockByPoint(block.x, block.y + 2);
-          // 判断上面是否可放置木板
-          if (prevBlock && this.putDownAble(block.x, block.y - 2, true)) {
-            prevBlock.changeStatus(4);
-            prevBlock.putDownAble = true;
-          }
-          // 判断下面是否可放置木板
-          if (nextBlock && this.putDownAble(block.x, block.y + 2, false)) {
-            nextBlock.changeStatus(4);
-            nextBlock.putDownAble = true;
-          }
-        } else { // 横
-          prevBlock = block.x === 1 ? null : this.getBlockByPoint(block.x - 2, block.y);
-          nextBlock = block.x === 17 ? null : this.getBlockByPoint(block.x + 2, block.y);
-          // 判断左边是否可放置木板
-          if (prevBlock && this.putDownAble(block.x - 2, block.y, true)) {
-            prevBlock.changeStatus(4);
-            prevBlock.putDownAble = true;
-          }
-          // 判断右边是否可放置木板
-          if (nextBlock && this.putDownAble(block.x + 2, block.y, false)) {
-            nextBlock.changeStatus(4);
-            nextBlock.putDownAble = true;
-          }
-        }
-        block.changeStatus(3); // 改变成点击状态
-
-        // 添加mousemove事件
-        document.addEventListener("mousemove", mousemove);
-        // 添加mouseup事件
-        document.addEventListener("mouseup", mouseup);
-
-        function mouseup(event) {
-          document.removeEventListener("mousemove", mousemove);
-          document.removeEventListener("mouseup", mouseup);
-          let x = self.getX(event);
-          let y = self.getY(event);
-          let upBlock = self.blocks.find((block) => {
-            if (block.isInRect && block.isInRect(x, y)) {
-              return true;
-            }
-          });
-          // 判断鼠标抬起是否是鼠标按下时木块的相邻木块
-          if (upBlock && (upBlock == prevBlock || upBlock == nextBlock) && upBlock.status == 3) {
-            block.changeStatus(0);
-            upBlock.changeStatus(0);
-          } else { // 放置失败
-            block.changeStatus(1);
-            if (prevBlock && prevBlock.status != 0) {
-              prevBlock.changeStatus(1);
-            }
-            if (nextBlock && nextBlock.status != 0) {
-              nextBlock.changeStatus(1);
-            }
-          }
-          // 清楚block的putDownAble标记
-          if (prevBlock) {
-            prevBlock.putDownAble = false;
-          }
-          if (nextBlock) {
-            nextBlock.putDownAble = false;
-          }
-        }
-        function mousemove(event) {
-          let x = self.getX(event);
-          let y = self.getY(event);
-          let moveBlock = self.blocks.find((block) => {
-            if (block.isInRect && block.isInRect(x, y)) {
-              return true;
-            }
-          });
-          //
-          let leftTag = self.putDownAble(prevBlock.x, prevBlock.y, );
-          // 判断moveBlock是否是合格的prevBlock、nextBlock
-          if (moveBlock && (moveBlock == prevBlock || moveBlock == nextBlock) && moveBlock.putDownAble) {
-            if (moveBlock == prevBlock && nextBlock) {
-              nextBlock.changeStatus(1);
-            } else if (moveBlock == nextBlock && prevBlock) {
-              prevBlock.changeStatus(1);
-            }
-            moveBlock.changeStatus(3);
-          }
-        }
-
+        this[plankOnclick](block);
       }
 
 
@@ -134,10 +44,10 @@ class Game {
   }
   /**
    * 判断是否能放板子
-   * @param  {number}   x   板子的x坐标
-   * @param  {number}   y   板子的y坐标
-   * @param  {boolean}  tag 标记
-   * @return {boolean}      是否能放板子(true | false)
+   * @param  {number}   x     板子的x坐标
+   * @param  {number}   y     板子的y坐标
+   * @param  {boolean}  tag   标记
+   * @return {boolean}        是否能放板子(true | false)
    */
   putDownAble(x, y, tag) {
     let leftBlock;
@@ -232,6 +142,7 @@ class Game {
       this.draw();
     }, 1000 / 60);
   }
+  // 画
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     let blocks = this.blocks;
@@ -242,6 +153,100 @@ class Game {
       this.ctx.fillStyle = block.color;
       this.ctx.fill();
       this.ctx.closePath();
+    }
+  }
+  // 木板点击
+  [plankOnclick](block) {
+    let self = this;
+    let prevBlock; // 前一个木板
+    let nextBlock; // 后一个木板
+    // 如果木板状态不为1和2，则return
+    if (block.status != 1 && block.status != 2) {
+      return;
+    }
+    // 判断是横还是竖木板
+    if (block.x % 2 == 0) { // 竖
+      prevBlock = block.y === 1 ? null : this.getBlockByPoint(block.x, block.y - 2);
+      nextBlock = block.y === 17 ? null : this.getBlockByPoint(block.x, block.y + 2);
+      // 判断上面是否可放置木板
+      if (prevBlock && this.putDownAble(block.x, block.y - 2, true)) {
+        prevBlock.changeStatus(4);
+        prevBlock.putDownAble = true;
+      }
+      // 判断下面是否可放置木板
+      if (nextBlock && this.putDownAble(block.x, block.y + 2, false)) {
+        nextBlock.changeStatus(4);
+        nextBlock.putDownAble = true;
+      }
+    } else { // 横
+      prevBlock = block.x === 1 ? null : this.getBlockByPoint(block.x - 2, block.y);
+      nextBlock = block.x === 17 ? null : this.getBlockByPoint(block.x + 2, block.y);
+      // 判断左边是否可放置木板
+      if (prevBlock && this.putDownAble(block.x - 2, block.y, true)) {
+        prevBlock.changeStatus(4);
+        prevBlock.putDownAble = true;
+      }
+      // 判断右边是否可放置木板
+      if (nextBlock && this.putDownAble(block.x + 2, block.y, false)) {
+        nextBlock.changeStatus(4);
+        nextBlock.putDownAble = true;
+      }
+    }
+    block.changeStatus(3); // 改变成点击状态
+
+    // 添加mousemove事件
+    document.addEventListener("mousemove", mousemove);
+    // 添加mouseup事件
+    document.addEventListener("mouseup", mouseup);
+
+    function mouseup(event) {
+      document.removeEventListener("mousemove", mousemove);
+      document.removeEventListener("mouseup", mouseup);
+      let x = self.getX(event);
+      let y = self.getY(event);
+      let upBlock = self.blocks.find((block) => {
+        if (block.isInRect && block.isInRect(x, y)) {
+          return true;
+        }
+      });
+      // 判断鼠标抬起是否是鼠标按下时木块的相邻木块
+      if (upBlock && (upBlock == prevBlock || upBlock == nextBlock) && upBlock.status == 3) {
+        block.changeStatus(0);
+        upBlock.changeStatus(0);
+      } else { // 放置失败
+        block.changeStatus(1);
+        if (prevBlock && prevBlock.status != 0) {
+          prevBlock.changeStatus(1);
+        }
+        if (nextBlock && nextBlock.status != 0) {
+          nextBlock.changeStatus(1);
+        }
+      }
+      // 清楚block的putDownAble标记
+      if (prevBlock) {
+        prevBlock.putDownAble = false;
+      }
+      if (nextBlock) {
+        nextBlock.putDownAble = false;
+      }
+    }
+    function mousemove(event) {
+      let x = self.getX(event);
+      let y = self.getY(event);
+      let moveBlock = self.blocks.find((block) => {
+        if (block.isInRect && block.isInRect(x, y)) {
+          return true;
+        }
+      });
+      // 判断moveBlock是否是合格的prevBlock、nextBlock
+      if (moveBlock && (moveBlock == prevBlock || moveBlock == nextBlock) && moveBlock.putDownAble) {
+        if (moveBlock == prevBlock && nextBlock) {
+          nextBlock.changeStatus(1);
+        } else if (moveBlock == nextBlock && prevBlock) {
+          prevBlock.changeStatus(1);
+        }
+        moveBlock.changeStatus(3);
+      }
     }
   }
 }

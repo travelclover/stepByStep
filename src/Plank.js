@@ -21,6 +21,9 @@ class Plank extends Block {
   }
   // 改变木板状态
   changeStatus(status) {
+    if (this.status === 0) { // 木板状态为0时不可更改
+      return;
+    }
     this.status = status;
     switch (status) {
       case 1: // 默认状态
