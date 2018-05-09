@@ -5,6 +5,7 @@ import Block from './Block.js';
 class Plank extends Block {
   constructor(x, y, SPACE_WIDTH, SQUARE_WIDTH) {
     super(x, y, SPACE_WIDTH, SQUARE_WIDTH);
+    this.type = 'PLANK'; // 种类
     this.color = '#ECBF7E'; // 默认颜色
     this.status = 1; // 默认状态
     this.putDownAble = false; // 能否放置木板

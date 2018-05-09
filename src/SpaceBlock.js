@@ -4,6 +4,7 @@ import Block from './Block.js';
 class SpaceBlock extends Block {
   constructor(x, y, SPACE_WIDTH, SQUARE_WIDTH) {
     super(x, y, SPACE_WIDTH, SQUARE_WIDTH);
+    this.type = 'SPACEBLOCK';
     this.color = '#fff';
     this.hoverColor = '#fff';
     this.width = SPACE_WIDTH;

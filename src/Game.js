@@ -3,12 +3,22 @@ import SpaceBlock from './SpaceBlock.js';
 import HorizontalBlock from './HorizontalBlock.js';
 import VerticalBlock from './VerticalBlock.js';
 import SquareBlock from './SquareBlock.js';
+import Chess from './Chess.js';
 
 const plankOnclick = Symbol('plankOnclick'); // 木板点击函数的函数名，为了私有方法效果
+const chessOnclick = Symbol('chessOnclick'); // 棋子点击函数的函数名，为了私有方法效果
+const squareBlockOnclick = Symbol('squareBlockOnclick'); // 棋格点击函数的函数名，为了私有方法效果
+const createCheckerboard = Symbol('createCheckerboard'); // 生成棋盘
+const createChess = Symbol('createChess'); // 生成棋子
+const actionSys = Symbol('actionSys'); // 当前行动方系统信息
 
 class Game {
   constructor(id) {
     this.init(id);
+    this[actionSys] = { // 当前行动方系统信息
+      time: 0, // 步时
+      player: null, // 玩家
+    };
   }
   // 初始化
   init(id) {
@@ -18,7 +28,9 @@ class Game {
     this.canvas.height = this.canvas.clientHeight;
     this.SPACE_WIDTH = this.canvas.clientHeight / 46; // 间隙宽度
     this.SQUARE_WIDTH = 4 * this.SPACE_WIDTH; // 棋格宽度
-    this.createCheckerboard(); // 生成棋盘
+    this[createCheckerboard](); // 生成棋盘
+    this[createChess](); // 生成棋子
+
     // 添加事件
     this.canvas.addEventListener("mousemove", (event) => {
       this.x = this.getX(event);
@@ -27,17 +39,23 @@ class Game {
     this.canvas.addEventListener("mousedown", (event) => {
       let x = this.getX(event);
       let y = this.getY(event);
-      let block = this.blocks.find((block) => {
-        if (block.isInRect && block.isInRect(x, y)) {
-          return true;
+      let targets = this.draw({x: x, y: y});
+      if (targets.length > 0) {
+        let block = targets[targets.length - 1];
+        switch (block['type']) {
+          case 'PLANK': // 木板
+            this[plankOnclick](block);
+            break;
+          case 'CHESS': // 棋子
+            this[chessOnclick](block);
+            break;
+          case 'SQUAREBLOCK': // 棋格
+            this[squareBlockOnclick](block);
+            break;
+          default:
+            break;
         }
-      });
-
-      if (block.width != block.height) { // 宽高不相等则是木板
-        this[plankOnclick](block);
       }
-
-
     })
     // 开始游戏
     this.begin();
@@ -103,7 +121,7 @@ class Game {
     return event.clientY - this.canvas.getBoundingClientRect().top;
   }
   // 生成棋盘
-  createCheckerboard() {
+  [createCheckerboard]() {
     const ROW = 19;
     const COL = 19;
     let blocks = [];
@@ -129,7 +147,12 @@ class Game {
       }
     }
     this.blocks = blocks; // 方块集合
-    this.draw();
+  }
+  // 生成棋子
+  [createChess]() {
+    let p1 = new Chess(9, 1, '#FF0000', this.SPACE_WIDTH, this.SQUARE_WIDTH);
+    let p2 = new Chess(9, 17, '#0000FF', this.SPACE_WIDTH, this.SQUARE_WIDTH);
+    this.chess = [p1, p2];
   }
   // 游戏开始
   begin() {
@@ -142,8 +165,13 @@ class Game {
       this.draw();
     }, 1000 / 60);
   }
-  // 画
-  draw() {
+  /**
+   * 画
+   * @param  {object}   p     坐标对象 {x: 10, y: 11}
+   * @return {array}          返回点击的对象
+   */
+  draw(p) {
+    let targets = []; //
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     let blocks = this.blocks;
     for (let i = 0, len = blocks.length; i < len; i++) {
@@ -152,8 +180,32 @@ class Game {
       this.ctx.rect(block.left, block.top, block.width, block.height);
       this.ctx.fillStyle = block.color;
       this.ctx.fill();
+      if (p && this.ctx.isPointInPath(p.x, p.y)) {
+        targets.push(block);
+      }
       this.ctx.closePath();
     }
+    // 绘制棋子
+    for (let i = 0, len = this.chess.length; i < len; i++) {
+      let chess = this.chess[i];
+      this.ctx.beginPath();
+      this.ctx.arc(chess.pointX, chess.pointY, chess.radius, 0, Math.PI * 2, false);
+      this.ctx.fillStyle = chess.color;
+      this.ctx.fill();
+      if (p && this.ctx.isPointInPath(p.x, p.y)) {
+        targets.push(chess);
+      }
+      this.ctx.closePath();
+      // 绘制剩余木板数
+      this.ctx.beginPath();
+      this.ctx.fillStyle = chess.textColor;
+      this.ctx.font = chess.radius + 'px sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(chess.plankCount, chess.pointX, chess.pointY, 2 * chess.radius);
+      this.ctx.closePath();
+    }
+    return targets;
   }
   // 木板点击
   [plankOnclick](block) {
@@ -248,6 +300,14 @@ class Game {
         moveBlock.changeStatus(3);
       }
     }
+  }
+  // 棋子点击
+  [chessOnclick](block) {
+    alert('棋子')
+  }
+  // 棋格点击
+  [squareBlockOnclick](block) {
+    alert('棋格')
   }
 }
 
