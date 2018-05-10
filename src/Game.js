@@ -4,6 +4,7 @@ import HorizontalBlock from './HorizontalBlock.js';
 import VerticalBlock from './VerticalBlock.js';
 import SquareBlock from './SquareBlock.js';
 import Chess from './Chess.js';
+import socket from './socket.js';
 
 const plankOnclick = Symbol('plankOnclick'); // 木板点击函数的函数名，为了私有方法效果
 const chessOnclick = Symbol('chessOnclick'); // 棋子点击函数的函数名，为了私有方法效果
@@ -57,8 +58,6 @@ class Game {
         }
       }
     })
-    // 开始游戏
-    this.begin();
   }
   /**
    * 判断是否能放板子
@@ -164,6 +163,13 @@ class Game {
       });
       this.draw();
     }, 1000 / 60);
+  }
+  // 游戏准备
+  ready() {
+    let data = {
+      socketId: socket.id, // 链接id
+    }
+    socket.emit('ready', data);
   }
   /**
    * 画
