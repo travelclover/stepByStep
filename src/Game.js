@@ -5,20 +5,24 @@ import VerticalBlock from './VerticalBlock.js';
 import SquareBlock from './SquareBlock.js';
 import Chess from './Chess.js';
 import socket from './socket.js';
+import util from './util.js';
 
 const plankOnclick = Symbol('plankOnclick'); // 木板点击函数的函数名，为了私有方法效果
 const chessOnclick = Symbol('chessOnclick'); // 棋子点击函数的函数名，为了私有方法效果
 const squareBlockOnclick = Symbol('squareBlockOnclick'); // 棋格点击函数的函数名，为了私有方法效果
 const createCheckerboard = Symbol('createCheckerboard'); // 生成棋盘
 const createChess = Symbol('createChess'); // 生成棋子
-const actionSys = Symbol('actionSys'); // 当前行动方系统信息
+const gameInfo = Symbol('gameInfo'); // 当前游戏系统信息
+const changeActionPlayer = Symbol('changeActionPlayer'); // 切换当前玩家
 
 class Game {
   constructor(id) {
     this.init(id);
-    this[actionSys] = { // 当前行动方系统信息
-      time: 0, // 步时
-      player: null, // 玩家
+    this[gameInfo] = { // 当前游戏系统信息
+      step: 0, // 步数
+      startTime: null, // 游戏开始时长
+      stepTime: null, // 步时
+      actionPlayer: null, // 玩家
     };
   }
   // 初始化
@@ -30,7 +34,6 @@ class Game {
     this.SPACE_WIDTH = this.canvas.clientHeight / 46; // 间隙宽度
     this.SQUARE_WIDTH = 4 * this.SPACE_WIDTH; // 棋格宽度
     this[createCheckerboard](); // 生成棋盘
-    this[createChess](); // 生成棋子
 
     // 添加事件
     this.canvas.addEventListener("mousemove", (event) => {
@@ -38,6 +41,10 @@ class Game {
       this.y = this.getY(event);
     })
     this.canvas.addEventListener("mousedown", (event) => {
+      // 判断是否是当前玩家
+      if (socket.id != this[gameInfo]['actionPlayer']) {
+        return;
+      }
       let x = this.getX(event);
       let y = this.getY(event);
       let targets = this.draw({x: x, y: y});
@@ -148,13 +155,23 @@ class Game {
     this.blocks = blocks; // 方块集合
   }
   // 生成棋子
-  [createChess]() {
-    let p1 = new Chess(9, 1, '#FF0000', this.SPACE_WIDTH, this.SQUARE_WIDTH);
-    let p2 = new Chess(9, 17, '#0000FF', this.SPACE_WIDTH, this.SQUARE_WIDTH);
+  [createChess](players) {
+    let player1 = null;
+    let player2 = null;
+    if (players[0] == socket.id) {
+      player2 = players[0];
+      player1 = players[1];
+    } else {
+      player2 = players[1];
+      player1 = players[0];
+    }
+    let p1 = new Chess(9, 1, '#FF0000', player1, this.SPACE_WIDTH, this.SQUARE_WIDTH);
+    let p2 = new Chess(9, 17, '#0000FF', player2, this.SPACE_WIDTH, this.SQUARE_WIDTH);
     this.chess = [p1, p2];
   }
   // 游戏开始
-  begin() {
+  begin(players) {
+    this[createChess](players); // 生成棋子
     this.timer = setInterval(() => {
       this.blocks.forEach((block) => {
         if (block.hoverPlank) {
@@ -162,7 +179,13 @@ class Game {
         }
       });
       this.draw();
+      // 更新面板时间
+      this.updatePanleTime();
     }, 1000 / 60);
+    // 更新面板行动方
+    this.updatePanleActionPlayer();
+    let panle = util.$('.panle');
+    util.removeClass(panle, 'hidden');
   }
   // 游戏准备
   ready() {
@@ -216,6 +239,11 @@ class Game {
   // 木板点击
   [plankOnclick](block) {
     let self = this;
+    let chess = this.chess.find(item => item.id == socket.id); // 棋子
+    // 木板数量不够
+    if (chess.plankCount == 0) {
+      return;
+    }
     let prevBlock; // 前一个木板
     let nextBlock; // 后一个木板
     // 如果木板状态不为1和2，则return
@@ -271,6 +299,14 @@ class Game {
       if (upBlock && (upBlock == prevBlock || upBlock == nextBlock) && upBlock.status == 3) {
         block.changeStatus(0);
         upBlock.changeStatus(0);
+        chess.updatePlankCount(chess.plankCount - 1); // 更新剩余木板数量
+        let plankIndex = []; // 放置木板位置的索引数组
+        self.blocks.forEach((item, i) => {
+          if (item.type = 'PLANK' && item.status == 0) {
+            plankIndex.push(i);
+          }
+        });
+        chess.changeActionPlayer(plankIndex); // 切换当前玩家
       } else { // 放置失败
         block.changeStatus(1);
         if (prevBlock && prevBlock.status != 0) {
@@ -314,6 +350,53 @@ class Game {
   // 棋格点击
   [squareBlockOnclick](block) {
     alert('棋格')
+  }
+  // 更新游戏信息
+  updateGameInfo(info) {
+    if (info.step != undefined) this[gameInfo].step = info.step; // 步数
+    if (info.startTime != undefined) this[gameInfo].startTime = info.startTime; // 游戏开始时间
+    if (info.stepTime != undefined) this[gameInfo].stepTime = info.stepTime; // 步时
+    if (info.actionPlayer != undefined) this[gameInfo].actionPlayer = info.actionPlayer; // 当前行动玩家
+  }
+  // 更新面板时间
+  updatePanleTime() {
+    let time = util.$('.time');
+    let timeStr = new Date().getTime() - this[gameInfo].stepTime;
+    time.innerText = Math.floor(timeStr / 1000); // 更新时间
+  }
+  // 更新面板行动方
+  updatePanleActionPlayer() {
+    let panle = util.$('.panle');
+    if (socket.id == this[gameInfo].actionPlayer) {
+      util.addClass(panle, 'self');
+      util.removeClass(panle, 'other');
+    } else {
+      util.addClass(panle, 'other');
+      util.removeClass(panle, 'self');
+    }
+  }
+  // 切换行动玩家
+  changeActionPlayer(data) {
+    // 更新刚行动完的玩家棋子信息
+    let chess = this.chess.find(item => item.id == data.socketId);
+    chess.updatePosition(data.x, data.y);
+    chess.updatePlankCount(data.plankCount);
+    // 更新即将行动的玩家棋子信息
+    let actionChess = this.chess.find(item => item.id != data.socketId);
+    // 更新木板信息
+    if (data.socketId != socket.id) {
+      data.plankIndex.forEach(item => {
+        this.blocks[item].changeStatus(0);
+      });
+    }
+    // 更新游戏系统信息
+    let game = {
+      step: this[gameInfo].step + 1,
+      stepTime: new Date().getTime(),
+      actionPlayer: actionChess.id, // 更换成即将行动的玩家socket.id
+    }
+    this.updateGameInfo(game);
+    this.updatePanleActionPlayer();
   }
 }
 
