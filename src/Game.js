@@ -13,7 +13,7 @@ const squareBlockOnclick = Symbol('squareBlockOnclick'); // 棋格点击函数�
 const createCheckerboard = Symbol('createCheckerboard'); // 生成棋盘
 const createChess = Symbol('createChess'); // 生成棋子
 const gameInfo = Symbol('gameInfo'); // 当前游戏系统信息
-const changeActionPlayer = Symbol('changeActionPlayer'); // 切换当前玩家
+// const changeActionPlayer = Symbol('changeActionPlayer'); // 切换当前玩家
 
 class Game {
   constructor(id) {
@@ -302,7 +302,7 @@ class Game {
         chess.updatePlankCount(chess.plankCount - 1); // 更新剩余木板数量
         let plankIndex = []; // 放置木板位置的索引数组
         self.blocks.forEach((item, i) => {
-          if (item.type = 'PLANK' && item.status == 0) {
+          if (item.type == 'PLANK' && item.status == 0) {
             plankIndex.push(i);
           }
         });
