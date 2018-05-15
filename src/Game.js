@@ -431,8 +431,11 @@ class Game {
   }
   // 棋格点击
   [squareBlockOnclick](block) {
-    console.log('棋格')
-
+    if (block.putDownAble) {
+      let chess = this.chess.find(item => item.id == this[gameInfo]['actionPlayer']);
+      chess.updatePosition(block.x, block.y); // 更新位置
+      chess.changeActionPlayer(); // 更换行动方
+    }
     // 重置squareBlock的putDownAble属性为false
     this[resetSquareBlockPutDownAble]();
   }

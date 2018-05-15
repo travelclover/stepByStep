@@ -18,6 +18,8 @@ class Chess extends Block {
   updatePosition(x, y) {
     this.x = x;
     this.y = y;
+    this.left = Math.floor(x / 2) * (this.SPACE_WIDTH + this.SQUARE_WIDTH) + (x % 2) * this.SPACE_WIDTH; // x坐标
+    this.top = Math.floor(y / 2) * (this.SPACE_WIDTH + this.SQUARE_WIDTH) + (y % 2) * this.SPACE_WIDTH; // y坐标
     this.pointX = this.left + this.SQUARE_WIDTH / 2;
     this.pointY = this.top + this.SQUARE_WIDTH / 2;
   }
@@ -31,7 +33,7 @@ class Chess extends Block {
       x: this.x,
       y: this.y,
       plankCount: this.plankCount, // 木板数量
-      plankIndex: plankIndex, // 已经放置木板的索引位置
+      plankIndex: plankIndex ? plankIndex : [], // 已经放置木板的索引位置
     }
     socket.emit('changeActionPlayer', data);
   }
