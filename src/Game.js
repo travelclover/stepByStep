@@ -13,7 +13,8 @@ const squareBlockOnclick = Symbol('squareBlockOnclick'); // 棋格点击函数�
 const createCheckerboard = Symbol('createCheckerboard'); // 生成棋盘
 const createChess = Symbol('createChess'); // 生成棋子
 const gameInfo = Symbol('gameInfo'); // 当前游戏系统信息
-// const changeActionPlayer = Symbol('changeActionPlayer'); // 切换当前玩家
+const putDownChessAble = Symbol('putDownChessAble'); // 判断能否放棋子
+const resetSquareBlockPutDownAble = Symbol('resetSquareBlockPutDownAble'); // 重置squareBlock的putDownAble属性为false
 
 class Game {
   constructor(id) {
@@ -279,6 +280,8 @@ class Game {
       }
     }
     block.changeStatus(3); // 改变成点击状态
+    // 重置squareBlock的putDownAble属性为false
+    this[resetSquareBlockPutDownAble]();
 
     // 添加mousemove事件
     document.addEventListener("mousemove", mousemove);
@@ -345,11 +348,101 @@ class Game {
   }
   // 棋子点击
   [chessOnclick](block) {
-    alert('棋子')
+    // 判断点的棋子是不是自己的
+    if (block.id != this[gameInfo]['actionPlayer']) {
+      return;
+    }
+    // 获取四个方向相邻的格子
+    let fourBlock = new Array(4);
+    fourBlock[0] = this.getBlockByPoint(block.x, block.y - 2); // 上
+    fourBlock[1] = this.getBlockByPoint(block.x, block.y + 2); // 下
+    fourBlock[2] = this.getBlockByPoint(block.x - 2, block.y); // 左
+    fourBlock[3] = this.getBlockByPoint(block.x + 2, block.y); // 右
+    // 找出敌方棋子
+    let chess = this.chess.find(item => item.id != this[gameInfo]['actionPlayer']);
+    // 判断是否有被棋子占用的格子
+    fourBlock = fourBlock.map(item => {
+      if (item && item.x == chess.x && item.y == chess.y) {
+        if (chess.x - block.x > 0) { // 在自己的棋子右边
+          return this.getBlockByPoint(block.x + 4, block.y);
+        } else if (chess.x - block.x < 0) { // 在自己的棋子的左边
+          return this.getBlockByPoint(block.x - 4, block.y);
+        } else if (chess.y - block.y > 0) { // 在自己的棋子的下边
+          return this.getBlockByPoint(block.x, block.y + 4);
+        } else if (chess.y - block.y < 0) { // 在自己的棋子的上边
+          return this.getBlockByPoint(block.x, block.y - 4);
+        }
+      }
+      return item;
+    });
+    fourBlock.forEach(item => {
+      if (item && this[putDownChessAble](item, block)) {
+        item.putDownAble = true;
+      }
+    });
+  }
+  /**
+   * 判断能否放棋子
+   * @param  {object}   targetBlock   目标格子
+   * @param  {object}   centerBlock   中心格子（棋子所在格子）
+   * @return {Boolean}                返回true（能）和false（不能）
+   */
+  [putDownChessAble](targetBlock, centerBlock) {
+    if (Math.abs(targetBlock.x - centerBlock.x) == 2 || Math.abs(targetBlock.y - centerBlock.y) == 2) {
+      let x = (targetBlock.x + centerBlock.x) / 2;
+      let y = (targetBlock.y + centerBlock.y) / 2;
+      let plank = this.getBlockByPoint(x, y);
+      if (plank.status == 0) {
+        return false;
+      }
+    } else { // 中间需要判断两块板子
+      let x1;
+      let x2;
+      let y1;
+      let y2;
+      if (targetBlock.x == centerBlock.x) {
+        x1 = centerBlock.x;
+        x2 = centerBlock.x;
+        if (targetBlock.y < centerBlock.y) { // 目标格子在上
+          y1 = centerBlock.y - 1;
+          y2 = centerBlock.y - 3;
+        } else { // 目标格子在下
+          y1 = centerBlock.y + 1;
+          y2 = centerBlock.y + 3;
+        }
+      } else {
+        y1 = centerBlock.y;
+        y2 = centerBlock.y;
+        if (targetBlock.x < centerBlock.x) { // 目标格子在左
+          x1 = centerBlock.x - 1;
+          x2 = centerBlock.x - 3;
+        } else { // 目标格子在右
+          x1 = centerBlock.x + 1;
+          x2 = centerBlock.x + 3;
+        }
+      }
+      let plank1 = this.getBlockByPoint(x1, y1);
+      let plank2 = this.getBlockByPoint(x2, y2);
+      if (plank1.status == 0 || plank2.status == 0) {
+        return false;
+      }
+    }
+    return true;
   }
   // 棋格点击
   [squareBlockOnclick](block) {
-    alert('棋格')
+    console.log('棋格')
+
+    // 重置squareBlock的putDownAble属性为false
+    this[resetSquareBlockPutDownAble]();
+  }
+  // 重置squareBlock的putDownAble属性为false
+  [resetSquareBlockPutDownAble]() {
+    this.blocks.forEach(item => {
+      if (item.type == 'SQUAREBLOCK') {
+        item.putDownAble = false;
+      }
+    });
   }
   // 更新游戏信息
   updateGameInfo(info) {
@@ -379,8 +472,10 @@ class Game {
   changeActionPlayer(data) {
     // 更新刚行动完的玩家棋子信息
     let chess = this.chess.find(item => item.id == data.socketId);
-    chess.updatePosition(data.x, data.y);
-    chess.updatePlankCount(data.plankCount);
+    if (data.socketId != socket.id) {
+      chess.updatePosition(data.x, data.y);
+      chess.updatePlankCount(data.plankCount);
+    }
     // 更新即将行动的玩家棋子信息
     let actionChess = this.chess.find(item => item.id != data.socketId);
     // 更新木板信息
