@@ -39,6 +39,9 @@ class Plank extends Block {
       case 4: // 可选状态
         this.color = '#90FF90';
         break;
+      case 5: // 会挡住棋子唯一路线的状态
+        this.color = '#FF9090';
+        break;
       case 0: // 占用状态
       default:
         this.color = '#000000';

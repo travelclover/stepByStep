@@ -15,6 +15,7 @@ const createChess = Symbol('createChess'); // 生成棋子
 const gameInfo = Symbol('gameInfo'); // 当前游戏系统信息
 const putDownChessAble = Symbol('putDownChessAble'); // 判断能否放棋子
 const resetSquareBlockPutDownAble = Symbol('resetSquareBlockPutDownAble'); // 重置squareBlock的putDownAble属性为false
+const stopedChessArrive = Symbol('stopedChessArrive'); // 判断是否阻挡棋子到达对面
 
 class Game {
   constructor(id) {
@@ -71,7 +72,7 @@ class Game {
    * 判断是否能放板子
    * @param  {number}   x     板子的x坐标
    * @param  {number}   y     板子的y坐标
-   * @param  {boolean}  tag   标记
+   * @param  {boolean}  tag   标记(用以判断板子的相对位置，上和左为true)
    * @return {boolean}        是否能放板子(true | false)
    */
   putDownAble(x, y, tag) {
@@ -111,13 +112,126 @@ class Game {
     }
     return true;
   }
+
+  /**
+   * 判断2个棋子是否被阻挡
+   * @param  {array}   planks     将要新增的木板
+   * @return {boolean}            是否阻挡(true是 | false否)
+   */
+  [stopedChessArrive](planks) {
+    let self = this;
+    let blocks1 = JSON.parse(JSON.stringify(this.blocks));
+    let blocks2 = JSON.parse(JSON.stringify(this.blocks));
+    // 把对应的将要放木板位置为木板状态设置为0
+    for (let i = 0; i < planks.length; i++) {
+      let index = planks[i]['y'] * 19 + planks[i]['x'];
+      blocks1[index]['status'] = 0;
+      blocks2[index]['status'] = 0;
+    }
+    let chess1 = this.chess.find(item => item.id == this[gameInfo].actionPlayer); // 自己的棋子
+    let chess2 = this.chess.find(item => item.id != this[gameInfo].actionPlayer); // 对方的棋子
+    let startBlock1 = this.getBlockByPoint(chess1.x, chess1.y, blocks1); // 自己棋子起始位置所在方块
+    let startBlock2 = this.getBlockByPoint(chess2.x, chess2.y, blocks2); // 对方棋子起始位置所在方块
+    let stop1 = !findPath1(startBlock1);
+    let stop2 = !findPath2(startBlock2);
+    return Boolean(stop1 || stop2);
+    function findPath1(block) {
+      block.flag = true; // 标记
+      if (block.y == 1) {
+        return true;
+      } else {
+        // 判断右边
+        let rightPlank = self.getBlockByPoint(block.x + 1, block.y, blocks1);
+        let rightSquare = self.getBlockByPoint(block.x + 2, block.y, blocks1);
+        if (block.x < 17 && rightPlank.status != 0 && rightSquare && !rightSquare.flag) { // 能往右
+          if (findPath1(rightSquare)) {
+            return true;
+          }
+        } else { // 不能往右
+          // 判断上
+          let upPlank = self.getBlockByPoint(block.x, block.y - 1, blocks1);
+          let upSquare = self.getBlockByPoint(block.x, block.y - 2, blocks1);
+          if (block.y > 1 && upPlank.status != 0 && upSquare && !upSquare.flag) { // 能往上
+            if (findPath1(upSquare)) {
+              return true;
+            }
+          } else { // 不能往上
+            // 判断左
+            let leftPlank = self.getBlockByPoint(block.x - 1, block.y, blocks1);
+            let leftSquare = self.getBlockByPoint(block.x - 2, block.y, blocks1);
+            if (block.x > 1 && leftPlank.status != 0 && leftSquare && !leftSquare.flag) { // 能往左
+              if (findPath1(leftSquare)) {
+                return true;
+              }
+            } else { // 不能往左
+              // 判断下
+              let downPlank = self.getBlockByPoint(block.x, block.y + 1, blocks1);
+              let downSquare = self.getBlockByPoint(block.x, block.y + 2, blocks1);
+              if (block.y < 17 && downPlank.status != 0 && downSquare && !downSquare.flag) { // 能忘下
+                if (findPath1(downSquare)) {
+                  return true;
+                }
+              } else { // 不能往下
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+    function findPath2(block) {
+      block.flag = true; // 标记
+      if (block.y == 17) {
+        return true;
+      } else {
+        // 判断右边
+        let rightPlank = self.getBlockByPoint(block.x + 1, block.y, blocks2);
+        let rightSquare = self.getBlockByPoint(block.x + 2, block.y, blocks2);
+        if (block.x < 17 && rightPlank.status != 0 && rightSquare && !rightSquare.flag) { // 能往右
+          if (findPath2(rightSquare)) {
+            return true;
+          }
+        } else { // 不能往右
+          // 判断下
+          let downPlank = self.getBlockByPoint(block.x, block.y + 1, blocks2);
+          let downSquare = self.getBlockByPoint(block.x, block.y + 2, blocks2);
+          if (block.y < 17 && downPlank.status != 0 && downSquare && !downSquare.flag) { // 能往下
+            if (findPath2(downSquare)) {
+              return true;
+            }
+          } else { // 不能往下
+            // 判断左
+            let leftPlank = self.getBlockByPoint(block.x - 1, block.y, blocks2);
+            let leftSquare = self.getBlockByPoint(block.x - 2, block.y, blocks2);
+            if (block.x > 1 && leftPlank.status != 0 && leftSquare && !leftSquare.flag) { // 能往左
+              if (findPath2(leftSquare)) {
+                return true;
+              }
+            } else { // 不能往左
+              // 判断上
+              let upPlank = self.getBlockByPoint(block.x, block.y - 1, blocks2);
+              let upSquare = self.getBlockByPoint(block.x, block.y - 2, blocks2);
+              if (block.y > 1 && upPlank.status != 0 && upSquare && !upSquare.flag) { // 能往上
+                if (findPath2(upSquare)) {
+                  return true;
+                }
+              } else { // 不能往上
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   // 通过x,y坐标获取block
-  getBlockByPoint(x, y) {
+  getBlockByPoint(x, y, blocks) {
     if (x < 0 || y < 0 || x > 18 || y > 18) {
       return;
     }
     let index = 19 * y + x;
-    return this.blocks[index];
+    blocks = blocks || this.blocks;
+    return blocks[index];
   }
   // 获取鼠标x坐标
   getX(event) {
@@ -241,6 +355,7 @@ class Game {
   [plankOnclick](block) {
     let self = this;
     let chess = this.chess.find(item => item.id == socket.id); // 棋子
+    let planks = [block]; // 将要放的木板，用以检测棋子路线是否被阻挡
     // 木板数量不够
     if (chess.plankCount == 0) {
       return;
@@ -257,26 +372,50 @@ class Game {
       nextBlock = block.y === 17 ? null : this.getBlockByPoint(block.x, block.y + 2);
       // 判断上面是否可放置木板
       if (prevBlock && this.putDownAble(block.x, block.y - 2, true)) {
-        prevBlock.changeStatus(4);
-        prevBlock.putDownAble = true;
+        planks[1] = prevBlock;
+        // 判断是否阻挡棋子的路线
+        if (this[stopedChessArrive](planks)) {
+          prevBlock.changeStatus(5);
+        } else {
+          prevBlock.changeStatus(4);
+          prevBlock.putDownAble = true;
+        }
       }
       // 判断下面是否可放置木板
       if (nextBlock && this.putDownAble(block.x, block.y + 2, false)) {
-        nextBlock.changeStatus(4);
-        nextBlock.putDownAble = true;
+        planks[1] = nextBlock;
+        // 判断是否阻挡棋子的路线
+        if (this[stopedChessArrive](planks)) {
+          nextBlock.changeStatus(5);
+        } else {
+          nextBlock.changeStatus(4);
+          nextBlock.putDownAble = true;
+        }
       }
     } else { // 横
       prevBlock = block.x === 1 ? null : this.getBlockByPoint(block.x - 2, block.y);
       nextBlock = block.x === 17 ? null : this.getBlockByPoint(block.x + 2, block.y);
       // 判断左边是否可放置木板
       if (prevBlock && this.putDownAble(block.x - 2, block.y, true)) {
-        prevBlock.changeStatus(4);
-        prevBlock.putDownAble = true;
+        planks[1] = prevBlock;
+        // 判断是否阻挡棋子的路线
+        if (this[stopedChessArrive](planks)) {
+          prevBlock.changeStatus(5);
+        } else {
+          prevBlock.changeStatus(4);
+          prevBlock.putDownAble = true;
+        }
       }
       // 判断右边是否可放置木板
       if (nextBlock && this.putDownAble(block.x + 2, block.y, false)) {
-        nextBlock.changeStatus(4);
-        nextBlock.putDownAble = true;
+        planks[1] = nextBlock;
+        // 判断是否阻挡棋子的路线
+        if (this[stopedChessArrive](planks)) {
+          nextBlock.changeStatus(5);
+        } else {
+          nextBlock.changeStatus(4);
+          nextBlock.putDownAble = true;
+        }
       }
     }
     block.changeStatus(3); // 改变成点击状态
