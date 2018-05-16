@@ -147,34 +147,29 @@ class Game {
           if (findPath1(rightSquare)) {
             return true;
           }
-        } else { // 不能往右
-          // 判断上
-          let upPlank = self.getBlockByPoint(block.x, block.y - 1, blocks1);
-          let upSquare = self.getBlockByPoint(block.x, block.y - 2, blocks1);
-          if (block.y > 1 && upPlank.status != 0 && upSquare && !upSquare.flag) { // 能往上
-            if (findPath1(upSquare)) {
-              return true;
-            }
-          } else { // 不能往上
-            // 判断左
-            let leftPlank = self.getBlockByPoint(block.x - 1, block.y, blocks1);
-            let leftSquare = self.getBlockByPoint(block.x - 2, block.y, blocks1);
-            if (block.x > 1 && leftPlank.status != 0 && leftSquare && !leftSquare.flag) { // 能往左
-              if (findPath1(leftSquare)) {
-                return true;
-              }
-            } else { // 不能往左
-              // 判断下
-              let downPlank = self.getBlockByPoint(block.x, block.y + 1, blocks1);
-              let downSquare = self.getBlockByPoint(block.x, block.y + 2, blocks1);
-              if (block.y < 17 && downPlank.status != 0 && downSquare && !downSquare.flag) { // 能忘下
-                if (findPath1(downSquare)) {
-                  return true;
-                }
-              } else { // 不能往下
-                return false;
-              }
-            }
+        }
+        // 判断上
+        let upPlank = self.getBlockByPoint(block.x, block.y - 1, blocks1);
+        let upSquare = self.getBlockByPoint(block.x, block.y - 2, blocks1);
+        if (block.y > 1 && upPlank.status != 0 && upSquare && !upSquare.flag) { // 能往上
+          if (findPath1(upSquare)) {
+            return true;
+          }
+        }
+        // 判断左
+        let leftPlank = self.getBlockByPoint(block.x - 1, block.y, blocks1);
+        let leftSquare = self.getBlockByPoint(block.x - 2, block.y, blocks1);
+        if (block.x > 1 && leftPlank.status != 0 && leftSquare && !leftSquare.flag) { // 能往左
+          if (findPath1(leftSquare)) {
+            return true;
+          }
+        }
+        // 判断下
+        let downPlank = self.getBlockByPoint(block.x, block.y + 1, blocks1);
+        let downSquare = self.getBlockByPoint(block.x, block.y + 2, blocks1);
+        if (block.y < 17 && downPlank.status != 0 && downSquare && !downSquare.flag) { // 能忘下
+          if (findPath1(downSquare)) {
+            return true;
           }
         }
       }
@@ -191,34 +186,28 @@ class Game {
           if (findPath2(rightSquare)) {
             return true;
           }
-        } else { // 不能往右
-          // 判断下
-          let downPlank = self.getBlockByPoint(block.x, block.y + 1, blocks2);
-          let downSquare = self.getBlockByPoint(block.x, block.y + 2, blocks2);
-          if (block.y < 17 && downPlank.status != 0 && downSquare && !downSquare.flag) { // 能往下
-            if (findPath2(downSquare)) {
-              return true;
-            }
-          } else { // 不能往下
-            // 判断左
-            let leftPlank = self.getBlockByPoint(block.x - 1, block.y, blocks2);
-            let leftSquare = self.getBlockByPoint(block.x - 2, block.y, blocks2);
-            if (block.x > 1 && leftPlank.status != 0 && leftSquare && !leftSquare.flag) { // 能往左
-              if (findPath2(leftSquare)) {
-                return true;
-              }
-            } else { // 不能往左
-              // 判断上
-              let upPlank = self.getBlockByPoint(block.x, block.y - 1, blocks2);
-              let upSquare = self.getBlockByPoint(block.x, block.y - 2, blocks2);
-              if (block.y > 1 && upPlank.status != 0 && upSquare && !upSquare.flag) { // 能往上
-                if (findPath2(upSquare)) {
-                  return true;
-                }
-              } else { // 不能往上
-                return false;
-              }
-            }
+        }
+        // 判断下
+        let downPlank = self.getBlockByPoint(block.x, block.y + 1, blocks2);
+        let downSquare = self.getBlockByPoint(block.x, block.y + 2, blocks2);
+        if (block.y < 17 && downPlank.status != 0 && downSquare && !downSquare.flag) { // 能往下
+          if (findPath2(downSquare)) {
+            return true;
+          }
+        }
+        // 判断左
+        let leftPlank = self.getBlockByPoint(block.x - 1, block.y, blocks2);
+        let leftSquare = self.getBlockByPoint(block.x - 2, block.y, blocks2);
+        if (block.x > 1 && leftPlank.status != 0 && leftSquare && !leftSquare.flag) { // 能往左
+          if (findPath2(leftSquare)) {
+            return true;
+          }
+        }
+        let upPlank = self.getBlockByPoint(block.x, block.y - 1, blocks2);
+        let upSquare = self.getBlockByPoint(block.x, block.y - 2, blocks2);
+        if (block.y > 1 && upPlank.status != 0 && upSquare && !upSquare.flag) { // 能往上
+          if (findPath2(upSquare)) {
+            return true;
           }
         }
       }
