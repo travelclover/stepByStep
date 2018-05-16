@@ -6,6 +6,7 @@ import socket from './socket.js';
 window.onload = function () {
   let readyBtn = util.$('#readyBtn');
   let game = new Game('checkerboardWrap');
+  let tip = util.$('#tip');
 
   // 点击准备按钮
   readyBtn.addEventListener('click', function () {
@@ -19,6 +20,7 @@ window.onload = function () {
   // 收到已经准备的信息
   socket.on('ready', () => {
     util.addClass(readyBtn, 'hidden');
+    util.removeClass(tip, 'hidden');
   })
   // 房间信息
   socket.on('room info', (data) => {
@@ -26,6 +28,7 @@ window.onload = function () {
   });
   // 游戏开始
   socket.on('start-game', (room) => {
+    util.addClass(tip, 'hidden');
     let gameInfo = {
       step: 0, // 步数
       startTime: new Date().getTime(), // 游戏开始时长
