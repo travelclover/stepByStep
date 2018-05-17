@@ -21,6 +21,7 @@ window.onload = function () {
   socket.on('ready', () => {
     util.addClass(readyBtn, 'hidden');
     util.removeClass(tip, 'hidden');
+    tip.innerText = '等待其他玩家';
   })
   // 房间信息
   socket.on('room info', (data) => {
