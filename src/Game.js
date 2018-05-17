@@ -300,6 +300,7 @@ class Game {
       socketId: socket.id, // 链接id
     }
     socket.emit('ready', data);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // 清理画面
   }
   /**
    * 画
