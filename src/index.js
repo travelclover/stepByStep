@@ -34,6 +34,7 @@ window.onload = function () {
       startTime: new Date().getTime(), // 游戏开始时长
       stepTime: new Date().getTime(), // 步时
       actionPlayer: room.players[0], // 玩家
+      gameover: false, // 游戏是否结束
     }
     game.updateGameInfo(gameInfo);
     game.begin(room.players);
@@ -41,5 +42,9 @@ window.onload = function () {
   // 切换行动玩家
   socket.on('changeActionPlayer', (data) => {
     game.changeActionPlayer(data);
+  })
+  // 游戏结束
+  socket.on('gameover', (data) => {
+    game.gameover(data);
   })
 }

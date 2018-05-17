@@ -37,6 +37,20 @@ class Chess extends Block {
     }
     socket.emit('changeActionPlayer', data);
   }
+  // 结束游戏
+  gameover() {
+    let data = {
+      id: this.id,
+    }
+    socket.emit('gameover', data);
+  }
+  // leave room
+  leaveRoom(roomName) {
+    let data = {
+      roomName: roomName,
+    }
+    socket.emit('leaveRoom', data);
+  }
 }
 
 export default Chess;

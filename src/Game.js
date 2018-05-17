@@ -16,6 +16,7 @@ const gameInfo = Symbol('gameInfo'); // 当前游戏系统信息
 const putDownChessAble = Symbol('putDownChessAble'); // 判断能否放棋子
 const resetSquareBlockPutDownAble = Symbol('resetSquareBlockPutDownAble'); // 重置squareBlock的putDownAble属性为false
 const stopedChessArrive = Symbol('stopedChessArrive'); // 判断是否阻挡棋子到达对面
+const isGameover = Symbol('isGameover'); // 判断游戏是否结束
 
 class Game {
   constructor(id) {
@@ -25,6 +26,8 @@ class Game {
       startTime: null, // 游戏开始时长
       stepTime: null, // 步时
       actionPlayer: null, // 玩家
+      gameover: true, // 游戏是否结束
+      timer: null, // 定时器
     };
   }
   // 初始化
@@ -35,7 +38,6 @@ class Game {
     this.canvas.height = this.canvas.clientHeight;
     this.SPACE_WIDTH = this.canvas.clientHeight / 46; // 间隙宽度
     this.SQUARE_WIDTH = 4 * this.SPACE_WIDTH; // 棋格宽度
-    this[createCheckerboard](); // 生成棋盘
 
     // 添加事件
     this.canvas.addEventListener("mousemove", (event) => {
@@ -43,8 +45,8 @@ class Game {
       this.y = this.getY(event);
     })
     this.canvas.addEventListener("mousedown", (event) => {
-      // 判断是否是当前玩家
-      if (socket.id != this[gameInfo]['actionPlayer']) {
+      // 判断是否是当前玩家,游戏是否结束
+      if (socket.id != this[gameInfo]['actionPlayer'] || this[gameInfo].gameover) {
         return;
       }
       let x = this.getX(event);
@@ -275,8 +277,9 @@ class Game {
   }
   // 游戏开始
   begin(players) {
+    this[createCheckerboard](); // 生成棋盘
     this[createChess](players); // 生成棋子
-    this.timer = setInterval(() => {
+    this[gameInfo].timer = setInterval(() => {
       this.blocks.forEach((block) => {
         if (block.hoverPlank) {
           block.hoverPlank(this.x, this.y);
@@ -563,6 +566,10 @@ class Game {
       let chess = this.chess.find(item => item.id == this[gameInfo]['actionPlayer']);
       chess.updatePosition(block.x, block.y); // 更新位置
       chess.changeActionPlayer(); // 更换行动方
+      // 判断游戏是否结束
+      if (this[isGameover](chess)) {
+        chess.gameover();
+      }
     }
     // 重置squareBlock的putDownAble属性为false
     this[resetSquareBlockPutDownAble]();
@@ -575,12 +582,26 @@ class Game {
       }
     });
   }
+  // 判断游戏是否结束
+  [isGameover](chess) {
+    if (chess.y == 1) {
+      return true;
+    } else if (chess.y == 3) {
+      let plank = this.getBlockByPoint(chess.x, chess.y - 1);
+      let otherChess = this.chess.find(item => item.id != chess.id);
+      if (plank.status != 0 && otherChess.x == chess.x && otherChess.y == chess.y - 2) {
+        return true;
+      }
+    }
+    return false;
+  }
   // 更新游戏信息
   updateGameInfo(info) {
     if (info.step != undefined) this[gameInfo].step = info.step; // 步数
     if (info.startTime != undefined) this[gameInfo].startTime = info.startTime; // 游戏开始时间
     if (info.stepTime != undefined) this[gameInfo].stepTime = info.stepTime; // 步时
     if (info.actionPlayer != undefined) this[gameInfo].actionPlayer = info.actionPlayer; // 当前行动玩家
+    if (info.gameover != undefined) this[gameInfo].gameover = info.gameover; // 游戏是否结束
   }
   // 更新面板时间
   updatePanleTime() {
@@ -623,6 +644,40 @@ class Game {
     }
     this.updateGameInfo(game);
     this.updatePanleActionPlayer();
+    // 判断游戏是否结束
+    if (actionChess.id == socket.id && this[isGameover](actionChess)) {
+      actionChess.gameover();
+    }
+  }
+  // 游戏结束
+  gameover(data) {
+    let readyBtn = util.$('#readyBtn');
+    let tip = util.$('#tip');
+    let panle = util.$('.panle');
+    let game = {
+      step: 0, // 步数
+      startTime: null, // 游戏开始时长
+      stepTime: null, // 步时
+      actionPlayer: null, // 玩家
+      gameover: true, // 游戏是否结束
+    }
+    let chess = this.chess.find(item => item.id == socket.id);
+    chess.leaveRoom(data.roomName); // 离开房间
+    this.updateGameInfo(game); // 重置游戏信息
+    clearInterval(this[gameInfo].timer); // 清理画图的定时器
+    util.removeClass(tip, 'hidden'); // 显示提示信息
+    if (data.id == socket.id) {
+      tip.innerText = '游戏结束，你赢了！'
+    } else {
+      tip.innerText = '游戏结束，你输了！'
+    }
+    util.addClass(panle, 'hidden'); // 隐藏面板信息
+    // 清理棋盘
+    this.blocks = [];
+    // 清理棋子
+    this.chess = [];
+    // 显示准备按钮
+    util.removeClass(readyBtn, 'hidden');
   }
 }
 
