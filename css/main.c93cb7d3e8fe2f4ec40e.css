@@ -1,0 +1,38 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.checkerboard-wrap {
+  width: 690px;
+  height: 690px;
+  border: 1px solid #000;
+  margin: 0 auto;
+  position: relative;
+}
+.hidden {
+  display: none;
+}
+.panle {
+  position: absolute;
+  top: 0;
+  left: 692px;
+  width: 200px;
+  border: 1px solid #000;
+}
+.panle span {
+  font-weight: bolder;
+}
+.panle.self .other {
+  display: none;
+}
+.panle.self .action {
+  color: green;
+}
+.panle.other .self {
+  display: none;
+}
+.panle.other .action {
+  color: red;
+}
+
+/*# sourceMappingURL=main.c93cb7d3e8fe2f4ec40e.css.map*/
