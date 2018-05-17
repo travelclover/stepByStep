@@ -1,7 +1,7 @@
 
 import io from 'socket.io-client';
 
-const socket = io('https://111.231.215.103:3001/stepByStep', {
+const socket = io('https://www.notehut.cn:3001/stepByStep', {
   reconnection: true, // 是否自动重连
 });
 socket.on('news', function (data) {
