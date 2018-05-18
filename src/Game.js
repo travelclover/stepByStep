@@ -17,6 +17,7 @@ const putDownChessAble = Symbol('putDownChessAble'); // 判断能否放棋子
 const resetSquareBlockPutDownAble = Symbol('resetSquareBlockPutDownAble'); // 重置squareBlock的putDownAble属性为false
 const stopedChessArrive = Symbol('stopedChessArrive'); // 判断是否阻挡棋子到达对面
 const isGameover = Symbol('isGameover'); // 判断游戏是否结束
+const cancelChessBlink = Symbol('cancelChessBlink'); // 取消棋子闪烁
 
 class Game {
   constructor(id) {
@@ -25,7 +26,7 @@ class Game {
       step: 0, // 步数
       startTime: null, // 游戏开始时长
       stepTime: null, // 步时
-      actionPlayer: null, // 玩家
+      actionPlayer: null, // 当前行动方玩家的socketid
       gameover: true, // 游戏是否结束
       timer: null, // 定时器
     };
@@ -285,6 +286,18 @@ class Game {
           block.hoverPlank(this.x, this.y);
         }
       });
+      if (this[gameInfo].actionPlayer == socket.id) {
+        // 棋子闪烁效果
+        let chess = this.chess.find(item => item.id == this[gameInfo].actionPlayer);
+        let timeStr = new Date().getTime() - this[gameInfo].stepTime;
+        if ((timeStr % 1000) > 500) {
+          chess.color = '#FFF';
+          chess.textColor = '#0000FF';
+        } else {
+          chess.color = '#0000FF';
+          chess.textColor = '#FFF';
+        }
+      }
       this.draw();
       // 更新面板时间
       this.updatePanleTime();
@@ -293,6 +306,12 @@ class Game {
     this.updatePanleActionPlayer();
     let panle = util.$('.panle');
     util.removeClass(panle, 'hidden');
+  }
+  // 取消棋子闪烁
+  [cancelChessBlink](socketId) {
+    let chess = this.chess.find(item => item.id == socketId);
+    chess.color = '#0000FF';
+    chess.textColor = '#FFF';
   }
   // 游戏准备
   ready() {
@@ -636,6 +655,9 @@ class Game {
       data.plankIndex.forEach(item => {
         this.blocks[item].changeStatus(0);
       });
+    } else {
+      // 取消棋子闪烁
+      this[cancelChessBlink](data.socketId);
     }
     // 更新游戏系统信息
     let game = {
