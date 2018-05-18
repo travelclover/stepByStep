@@ -1,6 +1,7 @@
 
 import io from 'socket.io-client';
 
+// const socket = io('http://localhost:3001/stepByStep', {
 const socket = io('https://www.notehut.cn:3001/stepByStep', {
   reconnection: true, // 是否自动重连
 });
