@@ -5,6 +5,7 @@ import socket from './socket.js';
 
 window.onload = function () {
   let readyBtn = util.$('#readyBtn');
+  let giveUpBtn = util.$('#giveUpBtn');
   let game = new Game('checkerboardWrap');
   let tip = util.$('#tip');
 
@@ -12,6 +13,10 @@ window.onload = function () {
   readyBtn.addEventListener('click', function () {
     game.ready();
   }, false);
+  // 点击认输按钮
+  giveUpBtn.addEventListener('click', function () {
+    game.giveUp();
+  }, false)
 
   // 收到消息
   socket.on('message', (msg) => {

@@ -306,6 +306,9 @@ class Game {
     this.updatePanleActionPlayer();
     let panle = util.$('.panle');
     util.removeClass(panle, 'hidden');
+    // 显示认输按钮
+    let giveUpBtn = util.$('#giveUpBtn');
+    util.removeClass(giveUpBtn, 'hidden');
   }
   // 取消棋子闪烁
   [cancelChessBlink](socketId) {
@@ -320,6 +323,13 @@ class Game {
     }
     socket.emit('ready', data);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // 清理画面
+  }
+  // 游戏认输
+  giveUp() {
+    let data = {
+      socketId: socket.id,
+    }
+    socket.emit('giveUp', data);
   }
   /**
    * 画
@@ -675,6 +685,7 @@ class Game {
   // 游戏结束
   gameover(data) {
     let readyBtn = util.$('#readyBtn');
+    let giveUpBtn = util.$('#giveUpBtn');
     let tip = util.$('#tip');
     let panle = util.$('.panle');
     let game = {
@@ -701,6 +712,8 @@ class Game {
     this.chess = [];
     // 显示准备按钮
     util.removeClass(readyBtn, 'hidden');
+    // 隐藏认输按钮
+    util.addClass(giveUpBtn, 'hidden');
   }
 }
 
