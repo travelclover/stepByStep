@@ -597,9 +597,9 @@ class Game {
       chess.updatePosition(block.x, block.y); // 更新位置
       chess.changeActionPlayer(); // 更换行动方
       // 判断游戏是否结束
-      if (this[isGameover](chess)) {
-        chess.gameover();
-      }
+      // if (this[isGameover](chess)) {
+      //   chess.gameover();
+      // }
     }
     // 重置squareBlock的putDownAble属性为false
     this[resetSquareBlockPutDownAble]();
@@ -657,6 +657,8 @@ class Game {
     if (data.socketId != socket.id) {
       chess.updatePosition(data.x, data.y);
       chess.updatePlankCount(data.plankCount);
+      // draw
+      this.draw();
     }
     // 更新即将行动的玩家棋子信息
     let actionChess = this.chess.find(item => item.id != data.socketId);
@@ -680,6 +682,8 @@ class Game {
     // 判断游戏是否结束
     if (actionChess.id == socket.id && this[isGameover](actionChess)) {
       actionChess.gameover();
+    } else if (actionChess.id != socket.id && this[isGameover](chess)) {
+      chess.gameover();
     }
   }
   // 游戏结束
