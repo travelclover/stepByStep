@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>stepByStep</title>
 </head>
+
 <body>
     <canvas class="checkerboard-wrap" id="checkerboardWrap">
         当前浏览器不支持Canvas，请更换浏览器后再试
@@ -15,8 +17,29 @@
         <p class="self">行动方：<span class="action">自己</span> </p>
         <p class="other">行动方：<span class="action">对方</span> </p>
     </div>
+    <div class="chat">
+        <ul class="msg-list" id="msgList">
+            <li class="self">
+                <p>
+                    <span class="nickname">我</span>: <span>你好</span>
+                </p>
+            </li>
+            <li class="other">
+                <p>
+                    <span class="nickname">对方</span>: <span>hello</span>
+                </p>
+            </li>
+        </ul>
+        <div class="send-wrap">
+            <div class="send-msg">
+                <input class="" type="text" id="sendMsgInput"></input>
+            </div>
+            <button class="send-btn" id="sendMsgBtn">发送</button>
+        </div>
+    </div>
     <button id="readyBtn">准备</button>
     <button id="giveUpBtn" class="hidden">认输</button>
     <p id="tip" class="hidden">等待其他玩家</p>
 </body>
+
 </html>

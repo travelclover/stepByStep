@@ -1,8 +1,12 @@
 // index.less
+@import "./reset.less";
 
 * {
   margin: 0;
   padding: 0;
+}
+div {
+  box-sizing: border-box;
 }
 
 .checkerboard-wrap {
@@ -16,6 +20,7 @@
   display: none;
 }
 
+// 面板信息
 .panle {
   position: absolute;
   top: 0;
@@ -40,6 +45,66 @@
     }
     .action {
       color: red;
+    }
+  }
+}
+
+// 聊天
+.chat {
+  position: absolute;
+  top: 50px;
+  left: 692px;
+  width: 200px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #000;
+
+  // 消息列表
+  .msg-list {
+    width: 100%;
+    flex: 1 41px;
+    overflow: auto;
+
+    li {
+      border-bottom: 1px dashed #ccc;
+      padding: 5px;
+
+      &.self {
+        .nickname {
+          color: green;
+        }
+      }
+      &.other {
+        .nickname {
+          color: red;
+        }
+      }
+    }
+  }
+
+  .send-wrap {
+    display: flex;
+    width: 100%;
+    height: 41px;
+    border-top: 1px solid #ccc;
+
+    .send-msg {
+      flex: 5;
+      box-sizing: border-box;
+      height: 40px;
+      resize: none;
+
+      input {
+        padding: 0 10px;
+        height: 40px;
+        border: 0;
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+    .send-btn {
+      flex: 1;
     }
   }
 }
