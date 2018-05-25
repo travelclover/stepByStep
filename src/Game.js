@@ -306,6 +306,9 @@ class Game {
     this.updatePanleActionPlayer();
     let panle = util.$('.panle');
     util.removeClass(panle, 'hidden');
+    // 显示聊天界面
+    let chatView = util.$('#chatView');
+    util.removeClass(chatView, 'invisible');
     // 显示认输按钮
     let giveUpBtn = util.$('#giveUpBtn');
     util.removeClass(giveUpBtn, 'hidden');
@@ -718,6 +721,14 @@ class Game {
     util.removeClass(readyBtn, 'hidden');
     // 隐藏认输按钮
     util.addClass(giveUpBtn, 'hidden');
+    // 清空聊天界面信息
+    let msgList = util.$('#msgList');
+    for (let i = msgList.children.length - 1; i >= 0; i--) {
+      msgList.removeChild(msgList.children[i]);
+    }
+    // 隐藏聊天界面
+    let chatView = util.$('#chatView');
+    util.addClass(chatView, 'invisible');
   }
 }
 

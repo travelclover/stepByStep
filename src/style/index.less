@@ -19,6 +19,10 @@ div {
 .hidden {
   display: none;
 }
+// 不可见
+.invisible {
+  visibility: hidden;
+}
 
 // 面板信息
 .panle {
@@ -71,12 +75,12 @@ div {
       padding: 5px;
 
       &.self {
-        .nickname {
-          color: green;
+        .nickname, .msg {
+          color: blue;
         }
       }
-      &.other {
-        .nickname {
+      &.system {
+        .nickname, .msg {
           color: red;
         }
       }
