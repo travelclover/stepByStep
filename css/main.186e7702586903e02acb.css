@@ -1,0 +1,224 @@
+/* reset */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+div {
+  box-sizing: border-box;
+}
+.checkerboard-wrap {
+  width: 690px;
+  height: 690px;
+  border: 1px solid #000;
+  margin: 0 auto;
+  position: relative;
+}
+.hidden {
+  display: none;
+}
+.invisible {
+  visibility: hidden;
+}
+.panle {
+  position: absolute;
+  top: 0;
+  left: 692px;
+  width: 200px;
+  border: 1px solid #000;
+}
+.panle span {
+  font-weight: bolder;
+}
+.panle.self .other {
+  display: none;
+}
+.panle.self .action {
+  color: green;
+}
+.panle.other .self {
+  display: none;
+}
+.panle.other .action {
+  color: red;
+}
+.chat {
+  position: absolute;
+  top: 50px;
+  left: 692px;
+  width: 200px;
+  height: 400px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
+  border: 1px solid #000;
+}
+.chat .msg-list {
+  width: 100%;
+  -ms-flex: 1 41px;
+      flex: 1 41px;
+  overflow: auto;
+}
+.chat .msg-list li {
+  border-bottom: 1px dashed #ccc;
+  padding: 5px;
+}
+.chat .msg-list li.self .nickname,
+.chat .msg-list li.self .msg {
+  color: blue;
+}
+.chat .msg-list li.system .nickname,
+.chat .msg-list li.system .msg {
+  color: red;
+}
+.chat .send-wrap {
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  height: 41px;
+  border-top: 1px solid #ccc;
+}
+.chat .send-wrap .send-msg {
+  -ms-flex: 5;
+      flex: 5;
+  box-sizing: border-box;
+  height: 40px;
+  resize: none;
+}
+.chat .send-wrap .send-msg input {
+  padding: 0 10px;
+  height: 40px;
+  border: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.chat .send-wrap .send-btn {
+  -ms-flex: 1;
+      flex: 1;
+}
+
+/*# sourceMappingURL=main.186e7702586903e02acb.css.map*/

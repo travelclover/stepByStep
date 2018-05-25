@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>stepByStep</title>
-<link href="./css/main.b571acb8f9e46e1d7ae6.css" rel="stylesheet"></head>
+<link href="./css/main.186e7702586903e02acb.css" rel="stylesheet"></head>
+
 <body>
     <canvas class="checkerboard-wrap" id="checkerboardWrap">
         当前浏览器不支持Canvas，请更换浏览器后再试
@@ -15,8 +17,34 @@
         <p class="self">行动方：<span class="action">自己</span> </p>
         <p class="other">行动方：<span class="action">对方</span> </p>
     </div>
+    <div class="chat invisible" id="chatView">
+        <ul class="msg-list" id="msgList">
+            <!--<li class="self">
+                <p>
+                    <span class="nickname">我</span>: <span class="msg">你好</span>
+                </p>
+            </li>
+            <li class="system">
+                <p>
+                    <span class="nickname">系统</span>: <span class="msg">a new user has joined the room</span>
+                </p>
+            </li>
+            <li class="other">
+                <p>
+                    <span class="nickname">对方</span>: <span class="msg">hello</span>
+                </p>
+            </li>-->
+        </ul>
+        <div class="send-wrap">
+            <div class="send-msg">
+                <input class="" type="text" id="sendMsgInput"></input>
+            </div>
+            <button class="send-btn" id="sendMsgBtn">发送</button>
+        </div>
+    </div>
     <button id="readyBtn">准备</button>
     <button id="giveUpBtn" class="hidden">认输</button>
     <p id="tip" class="hidden">等待其他玩家</p>
-<script type="text/javascript" src="./js/main.b571acb.js"></script></body>
+<script type="text/javascript" src="./js/main.186e770.js"></script></body>
+
 </html>
