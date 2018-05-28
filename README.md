@@ -1,5 +1,6 @@
 # stepByStep
 A two-person intelligence game.
+双人智力在线桌游。
 
 ## 线上地址
 [进入游戏](https://travelclover.github.io/stepByStep/)
