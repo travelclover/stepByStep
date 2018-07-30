@@ -1,5 +1,5 @@
 # stepByStep
-A two-person intelligence game.
+A two-person Intellectual game.
 双人智力在线桌游。
 
 ## 线上地址
